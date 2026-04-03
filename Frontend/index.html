@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h2>Previsão de Preço de Casa</h2>
+
+  <label>Quantidade de quartos:</label><br>
+  <input type="number" id="rm" placeholder="Ex: 6" /><br><br>
+
+  <button onclick="prever()">Prever</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    async function prever() {
+      const rm = parseFloat(document.getElementById("rm").value);
+
+      const resposta = await fetch("http://127.0.0.1:8000/prever", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ rm: rm })
+      });
+
+      const data = await resposta.json();
+
+      document.getElementById("resultado").innerText =
+        "Preço previsto (Dólares em milhares): " + data.preco.toFixed(2);
+    }
+  </script>
+    
+</body>
+</html>
