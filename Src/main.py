@@ -15,7 +15,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = joblib.load("modelo.pkl")
+Base_Dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(Base_Dir, "modelo.pkl")
+model = joblib.load(model_path)
+
 
 
 class CasaSimples(BaseModel):
