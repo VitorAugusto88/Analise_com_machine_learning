@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 import joblib
 import pandas as pd
 from pydantic import BaseModel
@@ -54,4 +55,4 @@ def prever(dados: CasaSimples):
 # teste
 @app.get("/")
 def home():
-    return {"message": "API funcionando"}
+    return FileResponse("Frontend/index.html")
