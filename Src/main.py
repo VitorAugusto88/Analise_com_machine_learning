@@ -5,6 +5,7 @@ import pandas as pd
 from pydantic import BaseModel
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -15,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static", StaticFiles(directory="Frontend"), name="static")
 
 Base_Dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(Base_Dir, "modelo.pkl")
@@ -52,7 +55,9 @@ def prever(dados: CasaSimples):
 
     return {"preco": float(previsao[0])}
 
+
+Base_Diro = os.path.dirname(os.path.abspath(__file__))
 # teste
 @app.get("/")
 def home():
-    return FileResponse("Frontend/index.html")
+    return FileResponse(os.path.join(Base_Diro, "..", "Frontend", "index.html"))
