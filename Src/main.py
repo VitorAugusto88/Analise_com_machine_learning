@@ -1,28 +1,32 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
-import joblib
-import pandas as pd
-from pydantic import BaseModel
-import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+import joblib
+import pandas as pd
+import os
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="Frontend"), name="static")
+# Caminhos absolutos baseados na localização do main.py (dentro de Src/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "..", "Frontend")
+MODEL_PATH = os.path.join(BASE_DIR, "modelo.pkl")
 
-Base_Dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(Base_Dir, "modelo.pkl")
-model = joblib.load(model_path)
+# Servir arquivos estáticos do Frontend
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
+# Carregar modelo
+model = joblib.load(MODEL_PATH)
 
 
 class CasaSimples(BaseModel):
@@ -45,19 +49,16 @@ medias = {
     "lstat": 12.65
 }
 
+
 @app.post("/prever")
 def prever(dados: CasaSimples):
     entrada = medias.copy()
     entrada["rm"] = dados.rm
-
     df = pd.DataFrame([entrada])
     previsao = model.predict(df)
-
     return {"preco": float(previsao[0])}
 
 
-Base_Diro = os.path.dirname(os.path.abspath(__file__))
-# teste
 @app.get("/")
 def home():
-    return FileResponse(os.path.join(Base_Diro, "..", "Frontend", "index.html"))
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
